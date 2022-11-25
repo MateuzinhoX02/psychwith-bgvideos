@@ -1,5 +1,7 @@
 package;
 
+import webm.WebmPlayer;
+import openfl.Lib;
 import flixel.graphics.FlxGraphic;
 #if desktop
 import Discord.DiscordClient;
@@ -429,6 +431,8 @@ class PlayState extends MusicBeatState
 		// String for when the game is paused
 		detailsPausedText = "Paused - " + detailsText;
 		#end
+			
+		removedVideo = false;	
 
 		GameOverSubstate.resetVariables();
 		var songName:String = Paths.formatToSongPath(SONG.song);
@@ -1678,6 +1682,127 @@ class PlayState extends MusicBeatState
 		}
 	}
 
+
+	public var fuckingVolume:Float = 1;
+	public var notDone:Bool = true;
+	public var vidSound:FlxSound;
+	public var useSound:Bool = false;
+	public var soundMultiplier:Float = 1;
+	public var prevSoundMultiplier:Float = 1;
+	public var videoFrames:Int = 0;
+	public var defaultText:String = "";
+	public var doShit:Bool = false;
+
+	public static var webmHandler:WebmHandler;
+
+	public var playingDathing = false;
+
+	public var videoSprite:FlxSprite;
+
+public function focusOut() {
+		if (paused)
+			return;
+		persistentUpdate = false;
+		persistentDraw = true;
+		paused = true;
+
+			if (FlxG.sound.music != null)
+			{
+				FlxG.sound.music.pause();
+				vocals.pause();
+			}
+
+		openSubState(new PauseSubState(boyfriend.getScreenPosition().x, boyfriend.getScreenPosition().y));
+	}
+	public function focusIn() 
+	{ 
+		// nada 
+	}
+
+	public function backgroundVideo(source:String, xPos:Float, yPos:Float, tamanho:String, chromakey:Float, cima:Float, baixo:Float)
+	{
+		//This will make the game dont crash
+		if(!OpenFlAssets.exists(source)) 
+		{
+			if(GlobalVideo.get() != null){
+			GlobalVideo.get().stop();
+
+			FlxG.stage.window.onFocusOut.remove(focusOut);
+			FlxG.stage.window.onFocusIn.remove(focusIn);
+			remove(videoSprite);
+			videoSprite.visible = false;
+			useVideo = false;
+				} else {
+			FlxG.log.add('The video name is wrong.');
+			}
+				} else {
+			useVideo = true;
+
+			FlxG.stage.window.onFocusOut.add(focusOut);
+			FlxG.stage.window.onFocusIn.add(focusIn);
+
+			var ourSource:String = "assets/videos/daWeirdVid/dontDelete.webm";
+			WebmPlayer.SKIP_STEP_LIMIT = 90;
+			var str1:String = "WEBM SHIT"; 
+			webmHandler = new WebmHandler();
+			webmHandler.source(ourSource);
+			// Using Matheus Silver methods.
+			videoSprite.x = xPos;
+			videoSprite.y = yPos;
+			videoSprite.cameras = [camOther];
+			videoSprite.visible = true;
+			if (tamanho != "full"){
+					videoSprite.scale.x = Std.parseFloat(tamanho);
+					videoSprite.scale.y = Std.parseFloat(tamanho);
+					} else {
+						videoSprite.setGraphicSize(FlxG.width, FlxG.height);
+					}
+				if (chromakey){
+					videoSprite.shader = new GreenScreenShader(); //Sonic EXE SYSTEMMMMmm!m!m!m!m!m!
+				}		
+			webmHandler.makePlayer();
+			webmHandler.webm.name = str1;
+
+			GlobalVideo.setWebm(webmHandler);
+
+			GlobalVideo.get().source(source);
+			GlobalVideo.get().clearPause();
+			if (GlobalVideo.isWebm)
+			{
+				GlobalVideo.get().updatePlayer();
+			}
+			GlobalVideo.get().show();
+
+			if (GlobalVideo.isWebm)
+			{
+				GlobalVideo.get().restart();
+			} else {
+				GlobalVideo.get().play();
+			}
+
+			var data = webmHandler.webm.bitmapData;
+					
+			remove(bg);		
+			remove(gf);
+			remove(boyfriend);
+			remove(dad);
+			if(baixo) {
+			add(videoSprite);
+			add(bg);
+			} else {
+			add(bg);
+			add(videoSprite);
+			}
+			add(gf);
+			add(boyfriend);
+			add(dad);
+
+			if (!songStarted)
+				webmHandler.pause();
+			else
+				webmHandler.resume();
+		}
+
 	function schoolIntro(?dialogueBox:DialogueBox):Void
 	{
 		inCutscene = true;
@@ -2359,6 +2484,9 @@ class PlayState extends MusicBeatState
 	function startSong():Void
 	{
 		startingSong = false;
+		
+		if (useVideo)
+			GlobalVideo.get().resume();
 
 		previousFrameTime = FlxG.game.ticks;
 		lastReportedPlayheadPosition = 0;
@@ -2868,6 +2996,8 @@ class PlayState extends MusicBeatState
 	public var paused:Bool = false;
 	public var canReset:Bool = true;
 	var startedCountdown:Bool = false;
+	public static var useVideo = false;
+	public static var removedVideo = false;
 	var canPause:Bool = true;
 	var limoSpeed:Float = 0;
 
@@ -2877,6 +3007,19 @@ class PlayState extends MusicBeatState
 		{
 			iconP1.swapOldIcon();
 		}*/
+		
+		if (useVideo && GlobalVideo.get() != null && !stopUpdate)
+			{		
+				if (GlobalVideo.get().ended && !removedVideo)
+				{
+					trace('ended');
+					remove(videoSprite);
+					FlxG.stage.window.onFocusOut.remove(focusOut);
+					FlxG.stage.window.onFocusIn.remove(focusIn);			
+					removedVideo = true;
+				}
+			}
+		
 		callOnLuas('onUpdate', [elapsed]);
 
 		switch (curStage)
@@ -3357,6 +3500,15 @@ class PlayState extends MusicBeatState
 		cancelMusicFadeTween();
 		MusicBeatState.switchState(new ChartingState());
 		chartingMode = true;
+		
+			if (useVideo)
+			{
+				GlobalVideo.get().stop();
+				remove(videoSprite);
+				FlxG.stage.window.onFocusOut.remove(focusOut);
+				FlxG.stage.window.onFocusIn.remove(focusIn);	
+				removedVideo = true;
+			}
 
 		#if desktop
 		DiscordClient.changePresence("Chart Editor", null, null, true);
@@ -3797,6 +3949,11 @@ class PlayState extends MusicBeatState
 					});
 				}
 
+
+			case 'comecarvideo': 
+				var posAvancado:Array<String> = value2.split(',');
+				backgroundVideo('assets/videos/' + value1 + '.webm', Std.parseFloat(posAvancado[0] + 0.1), Std.parseFloat(posAvancado[1] + 0.1), posAvancado[2], Std.parseFloat(posAvancado[3], Std.parseFloat(posAvancado[4], Std.parseFloat(posAvancado[5]));
+
 			case 'Set Property':
 				var killMe:Array<String> = value1.split('.');
 				if(killMe.length > 1) {
@@ -3926,6 +4083,14 @@ class PlayState extends MusicBeatState
 
 		deathCounter = 0;
 		seenCutscene = false;
+		
+		if (useVideo)
+		{
+			GlobalVideo.get().stop();
+			PlayState.instance.remove(PlayState.instance.videoSprite);
+			FlxG.stage.window.onFocusOut.remove(focusOut);
+			FlxG.stage.window.onFocusIn.remove(focusIn);	
+		}
 
 		#if ACHIEVEMENTS_ALLOWED
 		if(achievementObj != null) {
