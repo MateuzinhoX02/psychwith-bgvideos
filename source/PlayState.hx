@@ -3952,7 +3952,7 @@ public function focusOut() {
 
 			case 'comecarvideo': 
 				var posAvancado:Array<String> = value2.split(',');
-				backgroundVideo('assets/videos/' + value1 + '.webm', Std.parseFloat(posAvancado[0] + 0.1), Std.parseFloat(posAvancado[1] + 0.1), posAvancado[2], Std.parseFloat(posAvancado[3], Std.parseFloat(posAvancado[4], Std.parseFloat(posAvancado[5]));
+				backgroundVideo('assets/videos/' + value1 + '.webm', Std.parseFloat(posAvancado[0] + 0.1), Std.parseFloat(posAvancado[1] + 0.1), posAvancado[2], Std.parseFloat(posAvancado[3], Std.parseFloat(posAvancado[4]));
 
 			case 'Set Property':
 				var killMe:Array<String> = value1.split('.');
