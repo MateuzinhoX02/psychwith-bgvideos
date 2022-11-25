@@ -130,6 +130,11 @@ class PauseSubState extends MusicBeatSubstate
 
 		grpMenuShit = new FlxTypedGroup<Alphabet>();
 		add(grpMenuShit);
+		
+		if (PlayState.useVideo)
+			{
+				GlobalVideo.get().pause();
+			}
 
 		regenMenu();
 		cameras = [FlxG.cameras.list[FlxG.cameras.list.length - 1]];
@@ -223,6 +228,12 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.changedDifficulty = true;
 					practiceText.visible = PlayState.instance.practiceMode;
 				case "Restart Song":
+					if (PlayState.useVideo)
+					{
+						GlobalVideo.get().stop();
+						PlayState.instance.remove(PlayState.instance.videoSprite);
+						PlayState.removedVideo = true;
+					}
 					restartSong();
 				case "Leave Charting Mode":
 					restartSong();
@@ -243,6 +254,12 @@ class PauseSubState extends MusicBeatSubstate
 						close();
 					}
 				case "End Song":
+					if (PlayState.useVideo)
+					{
+						GlobalVideo.get().stop();
+						PlayState.instance.remove(PlayState.instance.videoSprite);
+						PlayState.removedVideo = true;
+					}
 					close();
 					PlayState.instance.finishSong(true);
 				case 'Toggle Botplay':
@@ -252,6 +269,12 @@ class PauseSubState extends MusicBeatSubstate
 					PlayState.instance.botplayTxt.alpha = 1;
 					PlayState.instance.botplaySine = 0;
 				case "Exit to menu":
+					if (PlayState.useVideo)
+					{
+						GlobalVideo.get().stop();
+						PlayState.instance.remove(PlayState.instance.videoSprite);
+						PlayState.removedVideo = true;
+					}
 					PlayState.deathCounter = 0;
 					PlayState.seenCutscene = false;
 
