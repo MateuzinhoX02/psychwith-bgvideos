@@ -3,7 +3,7 @@ package;
 import webm.WebmPlayer;
 import openfl.Lib;
 import flixel.graphics.FlxGraphic;
-#if desktopf
+#if desktop
 import Discord.DiscordClient;
 #end
 import Section.SwagSection;
