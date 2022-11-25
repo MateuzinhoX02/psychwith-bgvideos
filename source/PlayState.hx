@@ -3,7 +3,7 @@ package;
 import webm.WebmPlayer;
 import openfl.Lib;
 import flixel.graphics.FlxGraphic;
-#if desktop
+#if desktopf
 import Discord.DiscordClient;
 #end
 import Section.SwagSection;
@@ -1719,7 +1719,7 @@ public function focusOut() {
 		// nada 
 	}
 
-	public function backgroundVideo(source:String, xPos:Float, yPos:Float, tamanho:String, chromakey:Float, cima:Float, baixo:Float)
+	public function backgroundVideo(source:String, xPos:Float, yPos:Float, tamanho:String, chromakey:Float, camada:Float)
 	{
 		//This will make the game dont crash
 		if(!OpenFlAssets.exists(source)) 
@@ -1786,12 +1786,12 @@ public function focusOut() {
 			remove(gf);
 			remove(boyfriend);
 			remove(dad);
-			if(baixo) {
-			add(videoSprite);
+			if(!camada == 2) {
 			add(bg);
+			add(videoSprite);
 			} else {
-			add(bg);
 			add(videoSprite);
+			add(bg);
 			}
 			add(gf);
 			add(boyfriend);
