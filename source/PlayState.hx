@@ -1802,6 +1802,7 @@ public function focusOut() {
 			else
 				webmHandler.resume();
 		}
+	}
 
 	function schoolIntro(?dialogueBox:DialogueBox):Void
 	{
@@ -2181,6 +2182,7 @@ public function focusOut() {
 				});
 		}
 	}
+
 
 	var startTimer:FlxTimer;
 	var finishTimer:FlxTimer = null;
